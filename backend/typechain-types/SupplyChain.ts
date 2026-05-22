@@ -46,6 +46,7 @@ export interface SupplyChainInterface extends Interface {
       | "rmsCtr"
       | "showStage"
       | "sold"
+      | "stageTimestamps"
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "DIS", values: [BigNumberish]): string;
@@ -106,6 +107,10 @@ export interface SupplyChainInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "sold", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "stageTimestamps",
+    values: [BigNumberish, BigNumberish]
+  ): string;
 
   decodeFunctionResult(functionFragment: "DIS", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "Distribute", data: BytesLike): Result;
@@ -150,6 +155,10 @@ export interface SupplyChainInterface extends Interface {
   decodeFunctionResult(functionFragment: "rmsCtr", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "showStage", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "sold", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "stageTimestamps",
+    data: BytesLike
+  ): Result;
 }
 
 export interface SupplyChain extends BaseContract {
@@ -334,6 +343,12 @@ export interface SupplyChain extends BaseContract {
 
   sold: TypedContractMethod<[_medicineID: BigNumberish], [void], "nonpayable">;
 
+  stageTimestamps: TypedContractMethod<
+    [arg0: BigNumberish, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -483,6 +498,13 @@ export interface SupplyChain extends BaseContract {
   getFunction(
     nameOrSignature: "sold"
   ): TypedContractMethod<[_medicineID: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "stageTimestamps"
+  ): TypedContractMethod<
+    [arg0: BigNumberish, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
 
   filters: {};
 }

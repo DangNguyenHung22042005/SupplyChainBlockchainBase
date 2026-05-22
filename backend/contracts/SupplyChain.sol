@@ -59,6 +59,9 @@ contract SupplyChain {
     //To store all the medicines on the blockchain
     mapping(uint256 => medicine) public MedicineStock;
 
+    // Mapping from medicine ID to stage index (0 to 5) to block timestamp
+    mapping(uint256 => mapping(uint256 => uint256)) public stageTimestamps;
+
     //To show status to client applications
     function showStage(uint256 _medicineID)
         public
@@ -172,6 +175,7 @@ contract SupplyChain {
         require(MedicineStock[_medicineID].stage == STAGE.Init);
         MedicineStock[_medicineID].RMSid = _id;
         MedicineStock[_medicineID].stage = STAGE.RawMaterialSupply;
+        stageTimestamps[_medicineID][1] = block.timestamp;
     }
 
     //To check if RMS is available in the blockchain
@@ -191,6 +195,7 @@ contract SupplyChain {
         require(MedicineStock[_medicineID].stage == STAGE.RawMaterialSupply);
         MedicineStock[_medicineID].MANid = _id;
         MedicineStock[_medicineID].stage = STAGE.Manufacture;
+        stageTimestamps[_medicineID][2] = block.timestamp;
     }
 
     //To check if Manufacturer is available in the blockchain
@@ -210,6 +215,7 @@ contract SupplyChain {
         require(MedicineStock[_medicineID].stage == STAGE.Manufacture);
         MedicineStock[_medicineID].DISid = _id;
         MedicineStock[_medicineID].stage = STAGE.Distribution;
+        stageTimestamps[_medicineID][3] = block.timestamp;
     }
 
     //To check if distributor is available in the blockchain
@@ -229,6 +235,7 @@ contract SupplyChain {
         require(MedicineStock[_medicineID].stage == STAGE.Distribution);
         MedicineStock[_medicineID].RETid = _id;
         MedicineStock[_medicineID].stage = STAGE.Retail;
+        stageTimestamps[_medicineID][4] = block.timestamp;
     }
 
     //To check if retailer is available in the blockchain
@@ -248,6 +255,7 @@ contract SupplyChain {
         require(_id == MedicineStock[_medicineID].RETid); //Only correct retailer can mark medicine as sold
         require(MedicineStock[_medicineID].stage == STAGE.Retail);
         MedicineStock[_medicineID].stage = STAGE.sold;
+        stageTimestamps[_medicineID][5] = block.timestamp;
     }
 
     // To add new medicines to the stock
@@ -267,5 +275,6 @@ contract SupplyChain {
             0,
             STAGE.Init
         );
+        stageTimestamps[medicineCtr][0] = block.timestamp;
     }
 }

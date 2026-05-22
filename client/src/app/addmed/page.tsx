@@ -61,7 +61,6 @@ export default function AddMed() {
       setMed(medData)
       setMedStage(medStageData)
       
-      // Check role counts
       const rmsCount = await contract.methods.rmsCtr().call()
       const manCount = await contract.methods.manCtr().call()
       const disCount = await contract.methods.disCtr().call()
@@ -74,7 +73,6 @@ export default function AddMed() {
         ret: parseInt(retCount),
       })
       
-      // Check if current account is the owner
       const ownerStatus = await checkIsOwner()
       setIsOwner(ownerStatus)
       const owner = await getContractOwner()
@@ -118,330 +116,251 @@ export default function AddMed() {
   }
 
   const getStageColor = (stage: string) => {
-    if (stage.includes('Ordered')) return 'bg-blue-100 text-blue-700 border-blue-300'
-    if (stage.includes('Raw Material')) return 'bg-green-100 text-green-700 border-green-300'
-    if (stage.includes('Manufacturing')) return 'bg-yellow-100 text-yellow-700 border-yellow-300'
-    if (stage.includes('Distribution')) return 'bg-purple-100 text-purple-700 border-purple-300'
-    if (stage.includes('Retail')) return 'bg-orange-100 text-orange-700 border-orange-300'
-    if (stage.includes('Sold')) return 'bg-gray-100 text-gray-700 border-gray-300'
-    return 'bg-gray-100 text-gray-700 border-gray-300'
+    if (stage.includes('Ordered')) return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+    if (stage.includes('Raw Material')) return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+    if (stage.includes('Manufacturing')) return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+    if (stage.includes('Distribution')) return 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+    if (stage.includes('Retail')) return 'bg-orange-500/10 text-orange-400 border-orange-500/20'
+    if (stage.includes('Sold')) return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+    return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
   }
 
   if (loader) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto mb-4"></div>
-          <h1 className="text-2xl font-bold text-gray-700">Loading...</h1>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
+          <p className="text-slate-400 font-extrabold text-xl animate-pulse">Loading Blockchain Data...</p>
         </div>
       </div>
     )
   }
 
+  const hasMissingRoles = roleCounts.rms === 0 || roleCounts.man === 0 || roleCounts.dis === 0 || roleCounts.ret === 0
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-5">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">Order Materials</h1>
-                <p className="text-gray-600 text-sm">Create new material orders in the supply chain</p>
-              </div>
-            </div>
-            <button
-              onClick={() => router.push('/')}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              HOME
-            </button>
+    <div className="space-y-8 pb-12">
+      {/* Page Title */}
+      <div className="glass-card rounded-2xl p-6 md:p-8 relative overflow-hidden">
+        <div className="flex items-center space-x-5">
+          <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/10">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
           </div>
-          <div className="text-xs text-gray-500 font-mono bg-gray-50 p-2 rounded-lg">
-            <span className="font-semibold">Account:</span> {currentAccount}
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-100">Order Materials</h1>
+            <p className="text-slate-400 text-base md:text-lg mt-1">Initiate and order new raw material shipments on the Blockchain</p>
           </div>
         </div>
+      </div>
 
-        {/* Warning Messages */}
-        {!isOwner && (
-          <div className="mb-6 p-5 bg-red-50 border-l-4 border-red-500 rounded-xl shadow-lg">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div className="ml-3 flex-1">
-                <h3 className="text-red-800 font-bold mb-2">Access Restricted</h3>
-                <p className="text-red-700 text-sm mb-2">
-                  Only the contract owner can create material orders.
-                </p>
-                <div className="mt-3 space-y-1 text-xs">
-                  <p className="text-red-600">
-                    <span className="font-semibold">Contract Owner:</span> {contractOwner || 'Loading...'}
-                  </p>
-                  <p className="text-red-600">
-                    <span className="font-semibold">Your Account:</span> {currentAccount}
-                  </p>
-                </div>
+      {/* Access Restriction Warning */}
+      {!isOwner && (
+        <div className="glass-card border-red-500/30 glow-red rounded-2xl p-6 bg-red-500/5">
+          <div className="flex items-start space-x-4">
+            <svg className="w-8 h-8 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div className="space-y-2">
+              <h3 className="text-red-400 font-extrabold text-xl">Order Creation Restricted</h3>
+              <p className="text-slate-300 text-base md:text-lg">
+                Only the contract owner account (Owner) has the authority to create new raw material orders in this system.
+              </p>
+              <div className="mt-4 pt-3 border-t border-red-500/10 space-y-1.5 text-base font-mono">
+                <p className="text-slate-400">Contract Owner: <span className="text-red-400/90 break-all select-all font-bold">{contractOwner}</span></p>
+                <p className="text-slate-400">Your Connected Address: <span className="text-slate-300 break-all select-all font-bold">{currentAccount}</span></p>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Role Requirements Check */}
-        {isOwner && (roleCounts.rms === 0 || roleCounts.man === 0 || roleCounts.dis === 0 || roleCounts.ret === 0) && (
-          <div className="mb-6 p-5 bg-yellow-50 border-l-4 border-yellow-500 rounded-xl shadow-lg">
-            <div className="flex items-start mb-4">
-              <div className="flex-shrink-0">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div className="ml-3 flex-1">
-                <h3 className="text-yellow-800 font-bold mb-2">Requirements Not Met</h3>
-                <p className="text-yellow-700 text-sm">
-                  You must register at least one role of each type before ordering materials.
-                </p>
-              </div>
+      {/* Partner Roles Missing Warning */}
+      {isOwner && hasMissingRoles && (
+        <div className="glass-card border-amber-500/30 glow-yellow rounded-2xl p-6 bg-amber-500/5">
+          <div className="flex items-start space-x-4 mb-6">
+            <svg className="w-8 h-8 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <h3 className="text-amber-400 font-extrabold text-xl">Requirements Not Met</h3>
+              <p className="text-slate-300 text-base md:text-lg">
+                You must register at least one partner for each role below before proceeding with raw material orders.
+              </p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-              <div className={`p-3 rounded-lg border-2 ${roleCounts.rms > 0 ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                <div className="flex items-center mb-2">
-                  <svg className={`w-5 h-5 mr-2 ${roleCounts.rms > 0 ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {roleCounts.rms > 0 ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    )}
-                  </svg>
-                  <div className="text-xs font-semibold">Raw Material Supplier</div>
-                </div>
-                <div className={`text-lg font-bold ${roleCounts.rms > 0 ? 'text-green-700' : 'text-red-700'}`}>
-                  {roleCounts.rms} registered
-                </div>
-              </div>
-              <div className={`p-3 rounded-lg border-2 ${roleCounts.man > 0 ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                <div className="flex items-center mb-2">
-                  <svg className={`w-5 h-5 mr-2 ${roleCounts.man > 0 ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {roleCounts.man > 0 ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    )}
-                  </svg>
-                  <div className="text-xs font-semibold">Manufacturer</div>
-                </div>
-                <div className={`text-lg font-bold ${roleCounts.man > 0 ? 'text-green-700' : 'text-red-700'}`}>
-                  {roleCounts.man} registered
-                </div>
-              </div>
-              <div className={`p-3 rounded-lg border-2 ${roleCounts.dis > 0 ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                <div className="flex items-center mb-2">
-                  <svg className={`w-5 h-5 mr-2 ${roleCounts.dis > 0 ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {roleCounts.dis > 0 ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    )}
-                  </svg>
-                  <div className="text-xs font-semibold">Distributor</div>
-                </div>
-                <div className={`text-lg font-bold ${roleCounts.dis > 0 ? 'text-green-700' : 'text-red-700'}`}>
-                  {roleCounts.dis} registered
-                </div>
-              </div>
-              <div className={`p-3 rounded-lg border-2 ${roleCounts.ret > 0 ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                <div className="flex items-center mb-2">
-                  <svg className={`w-5 h-5 mr-2 ${roleCounts.ret > 0 ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {roleCounts.ret > 0 ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    )}
-                  </svg>
-                  <div className="text-xs font-semibold">Retailer</div>
-                </div>
-                <div className={`text-lg font-bold ${roleCounts.ret > 0 ? 'text-green-700' : 'text-red-700'}`}>
-                  {roleCounts.ret} registered
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => router.push('/roles')}
-              className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-              Go to Register Roles
-            </button>
           </div>
-        )}
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className={`p-4 rounded-xl border ${roleCounts.rms > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Supplier (RMS)</div>
+              <div className="text-xl font-extrabold mt-1.5">{roleCounts.rms} Registered</div>
+            </div>
+            <div className={`p-4 rounded-xl border ${roleCounts.man > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Manufacturer (MAN)</div>
+              <div className="text-xl font-extrabold mt-1.5">{roleCounts.man} Registered</div>
+            </div>
+            <div className={`p-4 rounded-xl border ${roleCounts.dis > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Distributor (DIS)</div>
+              <div className="text-xl font-extrabold mt-1.5">{roleCounts.dis} Registered</div>
+            </div>
+            <div className={`p-4 rounded-xl border ${roleCounts.ret > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Retailer (RET)</div>
+              <div className="text-xl font-extrabold mt-1.5">{roleCounts.ret} Registered</div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => router.push('/roles')}
+            className="mt-6 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-base font-extrabold transition-all flex items-center shadow-lg shadow-indigo-500/20 border border-indigo-500/30 cursor-pointer"
+          >
+            Go to Register Roles
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </button>
+        </div>
+      )}
+      
+      {/* Material order creation form */}
+      <div className="glass-card rounded-2xl p-8 md:p-10">
+        <div className="flex items-center space-x-4 mb-8">
+          <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shadow-inner">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-extrabold text-slate-200">Order Raw Materials</h2>
+        </div>
         
-        {/* Order Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-          <div className="flex items-center mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800">Create New Material Order</h2>
+        <form onSubmit={handlerSubmitMED} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input
+              className="w-full glass-input rounded-xl px-4 py-4 text-base md:text-lg font-semibold"
+              type="text"
+              onChange={handlerChangeNameMED}
+              placeholder="Raw Material Name (e.g. Lithium-Ion Battery)"
+              value={medName}
+              required
+              disabled={isSubmitting}
+            />
+            <input
+              className="w-full glass-input rounded-xl px-4 py-4 text-base md:text-lg font-semibold"
+              type="text"
+              onChange={handlerChangeDesMED}
+              placeholder="Detailed Description (e.g. 5000mAh Capacity)"
+              value={medDes}
+              required
+              disabled={isSubmitting}
+            />
           </div>
           
-          <form onSubmit={handlerSubmitMED} className="space-y-5">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          {/* Submit button (Standard thick padding: py-5) */}
+          <button
+            type="submit"
+            disabled={!isOwner || hasMissingRoles || isSubmitting}
+            className={`w-full py-5 rounded-xl font-extrabold tracking-wide transition-all shadow-lg flex items-center justify-center text-lg md:text-xl border ${
+              isOwner && !hasMissingRoles && !isSubmitting
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:scale-[1.01] hover:shadow-emerald-500/20 cursor-pointer border-emerald-500/30'
+                : 'bg-slate-800 text-slate-500 cursor-not-allowed border-slate-700/50'
+            }`}
+          >
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-              </div>
-              <input
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-lg"
-                type="text"
-                onChange={handlerChangeNameMED}
-                placeholder="Material Name"
-                value={medName}
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-            
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                Submitting transaction to Blockchain...
+              </>
+            ) : !isOwner ? (
+              <>
+                <svg className="w-6 h-6 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-              </div>
-              <input
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-lg"
-                type="text"
-                onChange={handlerChangeDesMED}
-                placeholder="Material Description"
-                value={medDes}
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-            
-            <button
-              type="submit"
-              disabled={!isOwner || roleCounts.rms === 0 || roleCounts.man === 0 || roleCounts.dis === 0 || roleCounts.ret === 0 || isSubmitting}
-              className={`w-full px-6 py-4 rounded-xl transition-all font-semibold text-lg flex items-center justify-center shadow-lg ${
-                isOwner && roleCounts.rms > 0 && roleCounts.man > 0 && roleCounts.dis > 0 && roleCounts.ret > 0 && !isSubmitting
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 hover:shadow-xl transform hover:scale-105'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              }`}
-            >
-              {isSubmitting ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </>
-              ) : !isOwner ? (
-                <>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  Only Owner Can Order
-                </>
-              ) : roleCounts.rms === 0 || roleCounts.man === 0 || roleCounts.dis === 0 || roleCounts.ret === 0 ? (
-                <>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  Register All Roles First
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Create Order
-                </>
-              )}
-            </button>
-          </form>
-        </div>
+                Only Contract Owner is authorized
+              </>
+            ) : hasMissingRoles ? (
+              <>
+                <svg className="w-6 h-6 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                All partner roles must be registered first
+              </>
+            ) : (
+              <>
+                <svg className="w-6 h-6 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Create Material Order
+              </>
+            )}
+          </button>
+        </form>
+      </div>
 
-        {/* Ordered Materials Table */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800">Ordered Materials</h2>
-            </div>
-            <div className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-semibold text-sm">
-              Total: {Object.keys(med).length} items
-            </div>
-          </div>
-          
-          {Object.keys(med).length === 0 ? (
-            <div className="text-center py-12">
-              <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+      {/* Placed material orders list */}
+      <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-800 bg-slate-900/40 flex items-center justify-between">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shadow-inner">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              <p className="text-gray-500 text-lg font-semibold">No materials ordered yet</p>
-              <p className="text-gray-400 text-sm mt-2">Create your first material order above</p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead>
-                  <tr className="bg-gradient-to-r from-green-50 to-emerald-50">
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">ID</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">Name</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">Description</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">Current Stage</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {Object.keys(med).map((key) => {
-                    const index = parseInt(key)
-                    const stage = medStage[index]
-                    return (
-                      <tr key={key} className="hover:bg-green-50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold mr-3 shadow-md">
-                              {med[index].id}
-                            </div>
-                            <span className="font-semibold text-gray-800">{med[index].id}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 font-medium text-gray-800">{med[index].name}</td>
-                        <td className="px-6 py-4 text-gray-600">{med[index].description}</td>
-                        <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStageColor(stage)}`}>
-                            {stage}
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+            <h2 className="font-extrabold text-slate-200 text-lg md:text-xl animate-none">Placed Material Orders</h2>
+          </div>
+          <span className="px-3.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 rounded-full text-sm font-extrabold">
+            Total: {Object.keys(med).length} items
+          </span>
         </div>
+        
+        {Object.keys(med).length === 0 ? (
+          <div className="text-center py-12 text-slate-500 space-y-3 bg-slate-950/10">
+            <svg className="w-14 h-14 mx-auto text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p className="text-base font-semibold">No material orders registered in the system yet.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto text-base">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-800 bg-slate-950/40 text-slate-400 font-extrabold">
+                  <th className="px-6 py-4">ID</th>
+                  <th className="px-6 py-4">Material Name</th>
+                  <th className="px-6 py-4">Description</th>
+                  <th className="px-6 py-4">Current Stage</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {Object.keys(med).map((key) => {
+                  const index = parseInt(key)
+                  const stage = medStage[index]
+                  return (
+                    <tr key={key} className="hover:bg-slate-900/35 transition-colors">
+                      <td className="px-6 py-4 font-mono font-extrabold text-slate-300">
+                        #{med[index].id}
+                      </td>
+                      <td className="px-6 py-4 font-bold text-slate-200">
+                        {med[index].name}
+                      </td>
+                      <td className="px-6 py-4 text-slate-300">
+                        {med[index].description}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3.5 py-1 rounded-full text-sm font-extrabold border ${getStageColor(stage)}`}>
+                          {stage}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   )
 }
-
